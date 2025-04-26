@@ -14,7 +14,7 @@
 |-----|-----|-----|
 |TODO 등록|POST|`/todo`|
 |세부 할 일 등록|POST|`/todo/{todo_id}/detail`|
-|TODO 조회|GET|`/todo`|
+|TODO 조회|GET|`/todo?page=1`|
 |TODO 상태 변경|PATCH|`/todo/{todo_id}`|
 |세부 할 일 상태 변경|PATCH|`/todo/detail/{detail_id}`|
 |TODO 삭제|DELETE|`/todo?ids=1,2,3`|
