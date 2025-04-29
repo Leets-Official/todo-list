@@ -1,104 +1,131 @@
-## 📋 TODO LIST
-이번 미션은 TODO 리스트를 구현하는 미션입니다.
+# 📝 TODO List 백엔드 프로젝트
 
-아래 요구사항에 맞춰 API 를 구상하고 구현합니다.
+## 📌 프로젝트 개요
+- **목적**: 사용자별 TODO 리스트 관리 기능 제공
+- **주요 기능**:
+  - TODO 등록
+  - TODO 목록 조회 (페이징)
+  - TODO 상태 변경
+  - TODO 삭제
+- **DB**: Docker 기반 MySQL 8.4.4 사용
+- **백엔드**: Spring Boot 3.4.4 + JPA
 
-PR 작성시 현재 리드미를 삭제하고 요구사항 명세서를 **반드시** 작성해주세요  
+---
 
-## 🎯 미션 요구사항
+## ⚙️ 실행 환경
+- Java 21 (Temurin 21)
+- Spring Boot 3.4.4
+- MySQL 8.4.4 (Docker 사용)
+- Gradle 빌드 시스템
 
-### 🔑 로그인 기능 (선택)
+---
 
-사용자는 이메일(email)과 비밀번호(password)를 통해 로그인해야 합니다.
+## 🚀 서버 실행 방법
 
-로그인에 성공한 사용자만 TODO 리스트에 접근할 수 있습니다.
+1. **Docker로 MySQL 실행**
+   ```bash
+   docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=1234 -p 3306:3306 -d mysql:8
+   ```
+   또는 이미 실행된 경우:
+   ```bash
+   docker start mysql-container
+   ```
 
-### 📌 TODO 리스트 CRUD (필수)
+2. **MySQL 접속 및 DB 생성**
+   ```bash
+   docker exec -it mysql-container mysql -u root -p
+   ```
+   ```sql
+   CREATE DATABASE todolist_db;
+   ```
 
-**TODO 등록**
+3. **Spring Boot 서버 실행**
+   ```bash
+   ./gradlew bootRun
+   ```
 
-사용자는 TODO를 등록할 수 있습니다.
-- TODO는 한번에 하나만 등록합니다.
+4. **서버 접속 주소**
+   ```
+   http://localhost:8080
+   ```
 
-각 TODO는 최대 3개의 세부 할 일을 포함할 수 있습니다.
-- 세부 할 일은 한번에 하나만 등록합니다.
+---
 
-**TODO 조회**
+## 📬 API 요청 예시 (Postman)
 
-TODO 리스트 조회 시, 페이지네이션을 통해 한 번에 10개씩 보여줘야 합니다.
-- 조회시 세부 할 일도 함께 조회해야 합니다.
+### 1. TODO 등록
 
-- **TODO 변경**
+- **URL**: `POST http://localhost:8080/todo`
+- **Body (JSON)**:
+  ```json
+  {
+    "title": "오늘 할 일",
+    "subTasks": [
+      { "content": "세부1" },
+      { "content": "세부2" }
+    ]
+  }
+  ```
+- **성공 응답 예시**:
+  ```json
+  {
+    "id": 1,
+    "title": "오늘 할 일",
+    "status": "진행 전"
+  }
+  ```
 
-TODO 는 하나씩 상태를 변경할 수 있습니다
-- TODO의 상태는 진행전, 진행중, 진행완료로 표시됩니다.
-- 세부 할 일은 진행전 진행완료만 표시됩니다.
+📸 **Postman 요청 및 응답 캡처 이미지 삽입**
 
-**TODO 삭제**
+---
 
-사용자는 TODO 및 세부 할 일을 완료 시 개별로 삭제할 수 있습니다.
+## 🗂 프로젝트 구조
 
-사용자는 여러 개의 TODO 및 세부 할 일을 한 번에 선택하여 삭제할 수 있습니다.
-
-### ⚠️ 예외 처리
-
-- 사용자의 모든 입력에 대해 예외 처리를 반드시 구현해야 합니다.
-- 예외 상황 발생 시 적절한 에러 메시지를 표시하고, 입력을 다시 받아야 합니다.
-
-```java
-public class UserNotfoundException extends ApplicationException {
-    public UserNotfoundException() {
-        super(HttpStatus.NOT_FOUND.value(), "유저를 찾을 수 없습니다.");
-    }
-}
+```
+com.todolist
+ ├── controller
+ │    └── TodoController.java
+ ├── dto
+ │    ├── TodoCreateRequest.java
+ │    ├── SubTaskRequest.java
+ │    └── TodoStatusRequest.java
+ ├── entity
+ │    ├── Todo.java
+ │    ├── SubTask.java
+ │    ├── TodoStatus.java
+ │    └── SubTaskStatus.java
+ ├── repository
+ │    └── TodoRepository.java
+ ├── service
+ │    └── TodoService.java
+ └── TodolistApplication.java
 ```
 
-### 🧪 테스트 코드 작성
+---
 
-- 반드시 모든 기능에 대한 테스트 코드를 작성해야 합니다.
-- 예외 상황에 대한 테스트 케이스도 포함되어야 합니다.
+## 🧪 테스트 코드
 
-**테스트 코드 예시**
-```java
-class UserManageUsecaseTest {
+- `src/test/java/com/todolist/TodolistApplicationTests.java` 파일에 테스트 코드 작성
+- 기능 테스트 항목:
+  - TODO 생성
+  - TODO 목록 조회
+  - TODO 상태 변경
+  - TODO 삭제
+- 모든 테스트 `BUILD SUCCESSFUL` 확인
 
-    private UserSaveService userSaveService;
-    private UserValidateService userValidateService;
-    private PasswordUtil passwordUtil;
-    private UserManageUsecase userManageUsecase;
+---
 
-    @BeforeEach
-    void setUp() {
-        userSaveService = mock(UserSaveService.class);
-        userValidateService = mock(UserValidateService.class);
-        passwordUtil = mock(PasswordUtil.class);
+## ✅ 수행 증거 캡처 정리
 
-        userManageUsecase = new UserManageUsecase(userSaveService, userValidateService, passwordUtil);
-    }
+- Docker MySQL 컨테이너 정상 실행 (`docker ps`)
+- MySQL 접속 및 `todolist_db` 생성 확인 (`SHOW DATABASES;`)
+- Spring Boot 서버 정상 부팅 (`Tomcat started on port 8080`)
+- Postman API 요청 성공 (`201 Created` 응답)
 
-    @Test
-    @DisplayName("회원가입 시 비밀번호는 암호화되고 저장되어야 한다")
-    void testRegisterUserSuccess() {
-        // given
-        String email = "test@example.com";
-        String rawPassword = "myPassword123";
-        String encryptedPassword = "encrypted123";
-        String nickname = "Tester";
+---
 
-        UserRegisterDto dto = new UserRegisterDto(email, rawPassword, nickname);
+## ✨ 비고
+- 로그인 기능은 선택사항이므로 제외하고 필수 TODO 기능만 구현
+- 예외처리 및 유효성 검증은 Controller, Service 단에서 처리
 
-        when(passwordUtil.encrypt(rawPassword)).thenReturn(encryptedPassword);
-
-        // when
-        userManageUsecase.register(dto);
-
-        // then
-        verify(userValidateService, times(1)).validateDuplication(email);
-        verify(passwordUtil, times(1)).encrypt(rawPassword);
-        verify(userSaveService, times(1)).save(any(User.class));
-    }
-}
-```
-
-
-
+---
