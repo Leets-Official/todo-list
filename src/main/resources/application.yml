@@ -1,17 +1,16 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: todolist
   datasource:
-    url: //각자 세팅
-    username: //각자 세팅
-    password: //각자 세팅
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
   jpa:
-    generate-ddl: true
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        jdbc:
-          time_zone: Asia/Seoul
+    show-sql: true
+  h2:
+    console:
+      enabled: true
